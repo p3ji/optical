@@ -45,3 +45,7 @@ Any element with `data-open-chicco-booking` opens the modal. For a live backend,
 - The Google Calendar action generates a client-side deep link.
 
 The Cloudflare Worker, D1, Google Calendar, Resend, and Twilio services are the natural production phase after API credentials and exact branch data are available.
+
+## Deployment
+
+Pushes to `main` publish a GitHub Pages artifact with the demo under `/demo_booking/`. The repository Pages URL is the immediately available host; `https://www.peji.com/demo_booking/` additionally requires the `www.peji.com` DNS record and Pages custom-domain setting to point to GitHub Pages.

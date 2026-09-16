@@ -49,3 +49,5 @@ The Cloudflare Worker, D1, Google Calendar, Resend, and Twilio services are the 
 ## Deployment
 
 Pushes to `main` publish a GitHub Pages artifact with the demo under `/demo_booking/`. The repository Pages URL is the immediately available host; `https://www.peji.com/demo_booking/` additionally requires the `www.peji.com` DNS record and Pages custom-domain setting to point to GitHub Pages.
+
+Live demo: [https://p3ji.github.io/optical/demo_booking/](https://p3ji.github.io/optical/demo_booking/)

@@ -18,6 +18,7 @@ test("patient completes a booking request from the static host", async ({ page }
   });
 
   await openBooking(page);
+  await expect(page.locator(`${host} .widget-logo`)).toHaveAttribute("src", /assets\/chicco-logo\.png$/);
 
   const continueButton = page.locator(`${host} .next`);
   await expect(continueButton).toBeDisabled();

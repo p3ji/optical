@@ -17,10 +17,7 @@
       button,a { touch-action:manipulation; }
       .site-nav { position:absolute; z-index:2; top:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; padding:24px clamp(20px,6vw,84px); }
       .brand { display:flex; align-items:center; gap:11px; color:var(--ink); text-decoration:none; font:800 21px/1 "Manrope",sans-serif; letter-spacing:-.6px; }
-      .brand-mark { width:40px; height:28px; position:relative; }
-      .brand-mark:before,.brand-mark:after { content:""; position:absolute; top:5px; width:21px; height:17px; border:3px solid var(--ink); border-radius:50%; }
-      .brand-mark:before { left:0; } .brand-mark:after { right:0; }
-      .brand-mark i { position:absolute; width:7px; height:3px; background:var(--ink); top:13px; left:17px; }
+      .brand-logo { width:48px; height:48px; display:block; border-radius:13px; object-fit:cover; box-shadow:0 5px 16px rgba(16,46,43,.08); }
       .nav-links { display:flex; gap:30px; align-items:center; }
       .nav-links a { color:var(--ink); text-decoration:none; font-size:14px; font-weight:600; }
       .nav-cta { padding:12px 18px; border:1px solid #163b37; border-radius:999px; }
@@ -37,20 +34,8 @@
       .faces { display:flex; }
       .faces span { width:30px; height:30px; border-radius:50%; background:#d0a17f; border:2px solid var(--cream); margin-left:-7px; display:grid; place-items:center; color:white; font-size:10px; }
       .faces span:first-child { margin:0; background:#234843; } .faces span:nth-child(2){background:#ed8a63}.faces span:nth-child(3){background:#80a99d}
-      .hero-art { background:#a8d8cb; position:relative; overflow:hidden; }
-      .sun { position:absolute; width:560px; height:560px; border-radius:50%; background:#f3c75f; left:50%; top:52%; transform:translate(-48%,-50%); }
-      .portrait { position:absolute; inset:14% 0 0; display:flex; align-items:flex-end; justify-content:center; }
-      .head { width:min(54%,360px); aspect-ratio:.77; border-radius:48% 48% 42% 44%; background:#7d4d35; position:relative; margin-bottom:7vh; box-shadow:inset 20px -20px 0 rgba(0,0,0,.06); }
-      .hair { position:absolute; inset:-9% -7% 53%; border-radius:50% 50% 42% 42%; background:#172f2c; transform:rotate(-4deg); }
-      .hair:after { content:""; position:absolute; width:40%; height:180%; background:#172f2c; right:-3%; top:35%; border-radius:50%; }
-      .glasses { position:absolute; top:38%; left:-13%; right:-13%; height:25%; }
-      .lens { position:absolute; top:0; width:48%; height:100%; border:10px solid #eae7dc; background:rgba(145,211,205,.42); border-radius:46% 46% 44% 44%; box-shadow:0 7px 0 rgba(16,46,43,.18); }
-      .lens:first-child { left:0; transform:rotate(4deg); } .lens:last-child { right:0; transform:rotate(-4deg); }
-      .glasses:after { content:""; position:absolute; left:45%; top:32%; width:12%; height:10px; background:#eae7dc; }
-      .eye { position:absolute; width:12px; height:6px; border-radius:0 0 12px 12px; background:#172f2c; top:48%; z-index:2; }
-      .eye.l { left:22%; } .eye.r { right:22%; }
-      .smile { position:absolute; left:36%; top:68%; width:29%; height:13%; border-bottom:5px solid #f5c5a3; border-radius:50%; transform:rotate(2deg); }
-      .shirt { position:absolute; bottom:-18%; width:85%; height:37%; border-radius:48% 48% 0 0; background:#ed6b4d; }
+      .hero-art { background:#8CBFB7; position:relative; overflow:hidden; }
+      .hero-portrait { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 42%; }
       .art-note { position:absolute; top:17%; right:7%; width:144px; padding:14px 16px; border-radius:16px; background:rgba(255,255,255,.88); backdrop-filter:blur(12px); box-shadow:0 14px 30px rgba(16,46,43,.12); font-size:12px; line-height:1.5; transform:rotate(3deg); }
       .art-note b { display:block; color:var(--coral); margin-bottom:4px; }
       .promise { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:#d5ddd7; }
@@ -60,14 +45,14 @@
       .promise p { color:#647570; line-height:1.6; margin:0; font-size:14px; }
       .demo-strip { padding:22px 28px; text-align:center; background:#102e2b; color:#cce2dc; font-size:13px; }
       @media(max-width:800px){
-        .nav-links a:not(.nav-cta){display:none}.site-nav{padding:20px}.hero{height:auto;max-height:none;min-height:100dvh;grid-template-columns:1fr}.hero-copy{min-height:640px;padding:130px 24px 76px}.hero-art{min-height:480px}.sun{width:440px;height:440px}.head{width:260px}.promise{grid-template-columns:1fr}.promise article{padding:32px 24px}.art-note{top:8%}
+        .nav-links a:not(.nav-cta){display:none}.site-nav{padding:20px}.hero{height:auto;max-height:none;min-height:100dvh;grid-template-columns:1fr}.hero-copy{min-height:640px;padding:130px 24px 76px}.hero-art{min-height:480px}.promise{grid-template-columns:1fr}.promise article{padding:32px 24px}.art-note{top:8%}
       }
-      @media(max-width:430px){h1{font-size:53px}.lead{font-size:16px;margin:24px 0}.rating{width:100%}.hero-copy{min-height:620px}.hero-art{min-height:430px}.nav-cta{padding:10px 14px}.brand{font-size:18px}}
+      @media(max-width:430px){h1{font-size:53px}.lead{font-size:16px;margin:24px 0}.rating{width:100%}.hero-copy{min-height:620px}.hero-art{min-height:460px}.hero-portrait{object-position:center 36%}.nav-cta{padding:10px 14px}.brand{font-size:16px;gap:8px}.brand-logo{width:42px;height:42px;border-radius:11px}}
     </style>
   </head>
   <body>
     <nav class="site-nav" aria-label="Main navigation">
-      <a class="brand" href="#"><span class="brand-mark" aria-hidden="true"><i></i></span>CHICCO OPTICAL</a>
+      <a class="brand" href="#"><img class="brand-logo" src="./assets/chicco-logo.png" alt="" />CHICCO OPTICAL</a>
       <div class="nav-links"><a href="#care">Eye care</a><a href="#locations">Locations</a><a class="nav-cta" href="#booking" data-open-chicco-booking>Book an exam</a></div>
     </nav>
     <main>
@@ -81,8 +66,8 @@
             <div class="rating"><div class="faces" aria-hidden="true"><span>AK</span><span>JM</span><span>RS</span></div><span><b>4.9</b> from local patients</span></div>
           </div>
         </div>
-        <div class="hero-art" aria-label="Illustration of a person wearing statement glasses">
-          <div class="sun"></div><div class="portrait"><div class="shirt"></div><div class="head"><div class="hair"></div><div class="eye l"></div><div class="eye r"></div><div class="glasses"><div class="lens"></div><div class="lens"></div></div><div class="smile"></div></div></div>
+        <div class="hero-art" aria-label="Editorial portrait of a stylish East Asian woman wearing statement glasses">
+          <img class="hero-portrait" src="./assets/hero-portrait.png" alt="A stylish East Asian woman in cat-eye glasses smiling gently" />
           <div class="art-note"><b>LOOK GOOD. SEE GREAT.</b>Great eyewear starts with a great eye exam.</div>
         </div>
       </section>

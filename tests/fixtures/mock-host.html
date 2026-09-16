@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Mock optical host</title>
+    <style>
+      body { margin: 0; min-height: 100dvh; display: grid; place-items: center; font-family: Arial, sans-serif; background: #ece8df; }
+      .host-card { width: min(520px, calc(100% - 32px)); padding: 32px; border-radius: 24px; background: white; text-align: center; }
+      button { min-height: 48px; padding: 0 20px; border: 0; border-radius: 999px; background: #102e2b; color: white; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <main class="host-card">
+      <h1>Mock host page</h1>
+      <p>The widget below is loaded exactly as it would be on a static client site.</p>
+      <button data-open-chicco-booking>Schedule an appointment</button>
+    </main>
+    <script src="../../booking-widget.js" data-mode="demo" data-email="pejisystems@gmail.com" data-sms="3439982681"></script>
+  </body>
+</html>

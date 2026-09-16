@@ -12,6 +12,18 @@ python -m http.server 4173
 
 Then visit `http://localhost:4173`.
 
+## Test
+
+Install the development dependency and browser once, then run the desktop and mobile integration suite:
+
+```powershell
+npm install
+npx playwright install chromium
+npm test
+```
+
+The tests load `tests/fixtures/mock-host.html` directly as a static `file:///` host and complete the booking flow without opening or sending the generated email, SMS, or calendar links.
+
 ## Embed
 
 ```html

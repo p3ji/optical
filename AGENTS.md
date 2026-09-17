@@ -11,6 +11,7 @@ Open `index.html`, or run `python -m http.server 4173` and visit `http://localho
 ## Deployment
 - Repository: `https://github.com/p3ji/optical`
 - Live demo (GitHub Pages): `https://p3ji.github.io/optical/demo_booking/`
+- Custom Subdomain: `https://demobooking.peji.ca/` (dedicated root demo).
 - Custom URL: `https://www.peji.ca/demo_booking/` (routed via Cloudflare Worker reverse-proxy to GitHub Pages).
 - Deploy: push `main`; `.github/workflows/deploy.yml` publishes automatically.
 - Booking API: `https://chicco-booking-api.push-peji.workers.dev` (Cloudflare Worker + D1).

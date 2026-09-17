@@ -43,3 +43,159 @@ test("generates branded confirmation email with service, time, and Google Calend
   assert.match(html, /calendar\.google\.com\/calendar\/render/);
   assert.match(html, /chicco-logo\.png/);
 });
+
+test("generates branded reminder email with 'See you tomorrow' and appointment details", async () => {
+  const { reminderEmail } = await import("../src/index.js");
+  const links = calendarLinks(booking, "https://booking.example.workers.dev");
+  const html = reminderEmail(booking, links);
+  assert.match(html, /CHICCO OPTICAL/);
+  assert.match(html, /Reminder/);
+  assert.match(html, /See you tomorrow, Jamie\./);
+  assert.match(html, /Comprehensive Eye Exam/);
+  assert.match(html, /10:30 AM/);
+  assert.match(html, /October 15, 2026/);
+  assert.match(html, /Kanata/);
+  assert.match(html, /Terry Fox Drive/);
+  assert.match(html, /Google Calendar/);
+  assert.match(html, /Please arrive 10 minutes early/);
+});
+
+test("calculates tomorrow's date and hour in Ottawa timezone", async () => {
+  const { getTomorrowOttawaDate, getOttawaHour } = await import("../src/index.js");
+  const testDate = new Date("2026-10-15T12:00:00Z");
+  const tomorrow = getTomorrowOttawaDate(testDate);
+  assert.equal(tomorrow, "2026-10-16");
+
+  const hour = getOttawaHour(testDate);
+  assert.equal(typeof hour, "number");
+  assert.ok(hour >= 0 && hour <= 23);
+});
+
+test("processReminders queries due bookings, sends reminder emails, and updates DB", async () => {
+  const { processReminders } = await import("../src/index.js");
+  const sentEmails = [];
+  const dbUpdates = [];
+
+  const mockDb = {
+    prepare(query) {
+      return {
+        bind(...args) {
+          return {
+            async all() {
+              if (query.includes("SELECT * FROM bookings")) {
+                return {
+                  results: [
+                    {
+                      id: "b-101",
+                      branch_id: "kanata",
+                      patient_name: "Sarah Test",
+                      patient_email: "sarah@example.com",
+                      patient_phone: "6135559876",
+                      service_type: "exam",
+                      appointment_date: "2026-10-16",
+                      appointment_time: "09:00",
+                      status: "CONFIRMED",
+                      reminder_sent_at: null,
+                    },
+                  ],
+                };
+              }
+              return { results: [] };
+            },
+            async run() {
+              if (query.includes("UPDATE bookings SET reminder_sent_at")) {
+                dbUpdates.push({ query, args });
+              }
+              return { success: true };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, options) => {
+    if (String(url).includes("api.resend.com")) {
+      const body = JSON.parse(options.body);
+      sentEmails.push(body);
+      return new Response(JSON.stringify({ id: "resend-remind-123" }), { status: 200 });
+    }
+    return originalFetch(url, options);
+  };
+
+  try {
+    const env = {
+      DB: mockDb,
+      RESEND_API_KEY: "test_key",
+      COORDINATOR_EMAIL: "pejisystems@gmail.com",
+      BOOKING_FROM_EMAIL: "Chicco Optical <bookings@peji.ca>",
+      PUBLIC_API_URL: "https://chicco-booking-api.push-peji.workers.dev",
+    };
+
+    const summary = await processReminders(env, "2026-10-16");
+    assert.equal(summary.total_due, 1);
+    assert.equal(summary.sent, 1);
+    assert.equal(summary.failed, 0);
+    assert.equal(sentEmails.length, 1);
+    assert.equal(sentEmails[0].to[0], "sarah@example.com");
+    assert.match(sentEmails[0].subject, /Reminder: Tomorrow's Comprehensive Eye Exam/);
+    assert.equal(dbUpdates.length, 1);
+    assert.equal(dbUpdates[0].args[0], "resend-remind-123");
+    assert.equal(dbUpdates[0].args[1], "b-101");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("handles /api/reminders/send endpoint and returns execution summary", async () => {
+  const mockDb = {
+    prepare(query) {
+      return {
+        bind() {
+          return {
+            async all() { return { results: [] }; },
+            async run() { return { success: true }; },
+          };
+        },
+      };
+    },
+  };
+
+  const res = await worker.fetch(new Request("https://demobooking.peji.ca/api/reminders/send?date=2026-10-16"), {
+    DB: mockDb,
+    PUBLIC_API_URL: "https://chicco-booking-api.push-peji.workers.dev",
+  });
+  assert.equal(res.status, 200);
+  const data = await res.json();
+  assert.equal(data.ok, true);
+  assert.equal(data.summary.date, "2026-10-16");
+  assert.equal(data.summary.total_due, 0);
+});
+
+test("handles worker.scheduled cron trigger", async () => {
+  let scheduledProcessed = false;
+  const mockDb = {
+    prepare(query) {
+      return {
+        bind() {
+          return {
+            async all() {
+              scheduledProcessed = true;
+              return { results: [] };
+            },
+            async run() { return { success: true }; },
+          };
+        },
+      };
+    },
+  };
+
+  await worker.scheduled({ cron: "0 12 * * *" }, {
+    DB: mockDb,
+    PUBLIC_API_URL: "https://chicco-booking-api.push-peji.workers.dev",
+  }, {});
+
+  assert.equal(scheduledProcessed, true);
+});
+

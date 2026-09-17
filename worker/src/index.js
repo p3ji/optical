@@ -255,16 +255,215 @@ export function confirmationEmail(booking, links) {
 </html>`;
 }
 
-async function sendConfirmation(env, booking, links) {
+export function reminderEmail(booking, links) {
+  const branch = BRANCHES[booking.branch_id];
+  const service = SERVICES[booking.service_type];
+  const formattedDate = new Intl.DateTimeFormat("en-CA", { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "America/Toronto" }).format(new Date(`${booking.appointment_date}T12:00:00Z`));
+  const formattedTime = formatTime(booking.appointment_time);
+  const firstName = escapeHtml(String(booking.patient_name || "").trim().split(" ")[0]);
+  const fullName = escapeHtml(String(booking.patient_name || "").trim());
+  const phoneFormatted = formatPhone(booking.patient_phone);
+  const logoSrc = "https://p3ji.github.io/optical/demo_booking/assets/chicco-logo.png";
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chicco Optical Appointment Reminder</title>
+</head>
+<body style="margin:0;padding:0;background:#f6f1e8;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#102e2b;-webkit-font-smoothing:antialiased">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f6f1e8;padding:32px 16px">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;background:#ffffff;border-radius:24px;overflow:hidden;border:1px solid #e4eae4;box-shadow:0 12px 36px rgba(16,46,43,0.08)">
+          <tr>
+            <td style="background:#102e2b;padding:24px 32px">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td style="vertical-align:middle">
+                    <table cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td style="vertical-align:middle;padding-right:12px">
+                          <img src="${logoSrc}" width="44" height="44" alt="Chicco Optical" style="display:block;border-radius:11px;background:#f6f1e8;border:0">
+                        </td>
+                        <td style="vertical-align:middle">
+                          <span style="display:block;font-family:'Manrope',Arial,sans-serif;font-size:18px;font-weight:800;letter-spacing:1px;color:#ffffff;line-height:1.2">CHICCO OPTICAL</span>
+                          <span style="display:block;font-size:11px;color:#9fd8c8;letter-spacing:0.5px;font-weight:500">Ottawa's Neighbourhood Opticians</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="vertical-align:middle">
+                    <span style="display:inline-block;background:rgba(237,107,77,0.2);border:1px solid rgba(237,107,77,0.4);color:#f8d9ca;font-size:10px;font-weight:800;letter-spacing:1.5px;padding:6px 12px;border-radius:999px;text-transform:uppercase">Reminder</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:36px 32px 28px">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td>
+                    <p style="margin:0 0 8px;color:#ed6b4d;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase">Upcoming Appointment Reminder</p>
+                    <h1 style="margin:0 0 12px;font-family:'Manrope',Arial,sans-serif;font-size:27px;font-weight:800;color:#102e2b;line-height:1.2">See you tomorrow, ${firstName}.</h1>
+                    <p style="margin:0 0 24px;color:#4b6763;font-size:14px;line-height:1.6">This is a friendly reminder of your appointment tomorrow at Chicco Optical. Please review your visit details below.</p>
+                  </td>
+                </tr>
+              </table>
+
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#fbf8f2;border:1px solid #dfe5df;border-radius:18px;margin-bottom:26px;overflow:hidden">
+                <tr>
+                  <td style="padding:22px">
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:16px">
+                      <tr>
+                        <td>
+                          <span style="display:block;color:#ed6b4d;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">Scheduled Service</span>
+                          <span style="display:block;font-family:'Manrope',Arial,sans-serif;font-size:18px;font-weight:800;color:#102e2b">${escapeHtml(service.name)}</span>
+                          <span style="display:block;font-size:12px;color:#657873;margin-top:2px">${service.duration} min duration</span>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <div style="border-top:1px solid #e5ebe7;margin-bottom:16px"></div>
+
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:16px">
+                      <tr>
+                        <td width="42" style="vertical-align:top;padding-right:12px">
+                          <div style="width:40px;height:40px;border-radius:10px;background:#f8d9ca;text-align:center;line-height:40px;font-size:17px">📅</div>
+                        </td>
+                        <td style="vertical-align:top">
+                          <span style="display:block;color:#657873;font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:3px">Date & Time</span>
+                          <span style="display:block;font-size:15px;font-weight:700;color:#102e2b">${escapeHtml(formattedDate)}</span>
+                          <span style="display:block;font-size:13px;font-weight:700;color:#ed6b4d;margin-top:2px">${escapeHtml(formattedTime)} EDT</span>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <div style="border-top:1px solid #e5ebe7;margin-bottom:16px"></div>
+
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td width="42" style="vertical-align:top;padding-right:12px">
+                          <div style="width:40px;height:40px;border-radius:10px;background:#d7eee7;text-align:center;line-height:40px;font-size:17px">📍</div>
+                        </td>
+                        <td style="vertical-align:top">
+                          <span style="display:block;color:#657873;font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:3px">Ottawa Clinic Location</span>
+                          <span style="display:block;font-size:15px;font-weight:700;color:#102e2b">${escapeHtml(branch.name)}</span>
+                          <span style="display:block;font-size:12px;color:#657873;margin-top:2px">${escapeHtml(branch.area)} · Ottawa, ON</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="background:#f4f7f4;border-top:1px solid #dfe5df;padding:12px 22px">
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td style="font-size:11px;color:#4b6763">
+                          Patient: <b>${fullName}</b> · ${escapeHtml(phoneFormatted)}
+                        </td>
+                        <td align="right" style="font-size:10px;color:#718985">
+                          Ref: <code style="font-family:monospace;background:#ffffff;padding:2px 5px;border-radius:4px;border:1px solid #dfe5df">${escapeHtml(String(booking.id || "").slice(0, 13))}</code>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:24px">
+                <tr>
+                  <td>
+                    <span style="display:block;font-size:12px;font-weight:700;color:#102e2b;margin-bottom:12px">Calendar links:</span>
+                    <table cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td style="padding-right:10px">
+                          <a href="${escapeHtml(links.google)}" target="_blank" style="display:inline-block;background:#102e2b;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:13px 22px;border-radius:999px;box-shadow:0 6px 16px rgba(16,46,43,0.18)">Google Calendar</a>
+                        </td>
+                        <td>
+                          <a href="${escapeHtml(links.ics)}" style="display:inline-block;background:#ffffff;color:#102e2b;border:1px solid #dfe5df;text-decoration:none;font-size:12px;font-weight:700;padding:12px 18px;border-radius:999px">Download Apple / ICS</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#edf7f3;border-left:4px solid #9fd8c8;border-radius:10px">
+                <tr>
+                  <td style="padding:14px 16px;font-size:12px;color:#2c524b;line-height:1.6">
+                    <b>Helpful tips for tomorrow:</b><br>
+                    • Please arrive 10 minutes early to complete check-in.<br>
+                    • Bring your current eyeglasses, sunglasses, or contact lens boxes if available.<br>
+                    • No medical card or OHIP details are required in advance.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="background:#f7f9f7;border-top:1px solid #edf0ec;padding:24px 32px">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td>
+                    <p style="margin:0 0 6px;font-size:12px;color:#4b6763;line-height:1.5">
+                      Need to reschedule or make a change? Reply to this email or call/text coordinator at <a href="tel:3439982681" style="color:#102e2b;font-weight:700;text-decoration:none">343-998-2681</a>.
+                    </p>
+                    <p style="margin:8px 0 0;font-size:11px;color:#7e8f8b;line-height:1.5">
+                      Chicco Optical · Five Ottawa Locations: Kanata · Barrhaven · Merivale · Riverside South · Downtown
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+export function getTomorrowOttawaDate(referenceDate = new Date()) {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Toronto",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const tomorrow = new Date(referenceDate.getTime() + 24 * 60 * 60 * 1000);
+  return formatter.format(tomorrow);
+}
+
+export function getOttawaHour(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Toronto",
+    hour: "numeric",
+    hourCycle: "h23",
+  }).formatToParts(date);
+  const hourPart = parts.find(p => p.type === "hour");
+  return Number(hourPart?.value ?? date.getUTCHours());
+}
+
+export async function sendReminderEmail(env, booking, links) {
   const fromAddress = env.BOOKING_FROM_EMAIL || "Chicco Optical <bookings@peji.ca>";
   const coordinator = env.COORDINATOR_EMAIL || "pejisystems@gmail.com";
+  const service = SERVICES[booking.service_type] || { name: "Eye Care Appointment" };
+  const formattedTime = formatTime(booking.appointment_time);
   const payload = {
     from: fromAddress,
     to: [booking.patient_email],
     bcc: [coordinator],
     reply_to: coordinator,
-    subject: `Confirmed: ${SERVICES[booking.service_type].name} at Chicco Optical`,
-    html: confirmationEmail(booking, links),
+    subject: `Reminder: Tomorrow's ${service.name} at ${formattedTime} — Chicco Optical`,
+    html: reminderEmail(booking, links),
   };
 
   let response = await fetch("https://api.resend.com/emails", {
@@ -274,9 +473,8 @@ async function sendConfirmation(env, booking, links) {
   });
   let result = await response.json();
 
-  // If custom domain is not yet verified in Resend, fall back to onboarding@resend.dev for test bookings to the coordinator
   if (!response.ok && String(result.message || "").toLowerCase().includes("not verified") && booking.patient_email === coordinator) {
-    console.warn("Custom domain not verified on Resend; falling back to onboarding@resend.dev for coordinator test booking");
+    console.warn("Custom domain not verified on Resend; falling back to onboarding@resend.dev for coordinator test reminder");
     payload.from = "Chicco Optical <onboarding@resend.dev>";
     response = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -287,10 +485,46 @@ async function sendConfirmation(env, booking, links) {
   }
 
   if (!response.ok) {
-    console.error("Resend API rejection:", JSON.stringify(result));
-    throw new Error(result.message || "Confirmation email could not be sent.");
+    console.error("Resend API rejection for reminder:", JSON.stringify(result));
+    throw new Error(result.message || "Reminder email could not be sent.");
   }
   return result.id;
+}
+
+export async function processReminders(env, targetDate, options = {}) {
+  const date = targetDate || getTomorrowOttawaDate();
+  let query = "SELECT * FROM bookings WHERE status = 'CONFIRMED' AND appointment_date = ?";
+  if (!options.force) {
+    query += " AND (reminder_sent_at IS NULL OR reminder_sent_at = '')";
+  }
+
+  const result = await env.DB.prepare(query).bind(date).all();
+  const dueBookings = result.results || [];
+  const summary = {
+    date,
+    total_due: dueBookings.length,
+    sent: 0,
+    failed: 0,
+    details: [],
+  };
+
+  for (const booking of dueBookings) {
+    const links = calendarLinks(booking, env.PUBLIC_API_URL);
+    try {
+      const emailId = await sendReminderEmail(env, booking, links);
+      await env.DB.prepare(
+        "UPDATE bookings SET reminder_sent_at = CURRENT_TIMESTAMP, reminder_email_id = ? WHERE id = ?"
+      ).bind(emailId, booking.id).run();
+      summary.sent++;
+      summary.details.push({ id: booking.id, patient_email: booking.patient_email, email_id: emailId, status: "SENT" });
+    } catch (err) {
+      console.error(`Failed to send reminder for booking ${booking.id}:`, err);
+      summary.failed++;
+      summary.details.push({ id: booking.id, patient_email: booking.patient_email, error: err.message, status: "FAILED" });
+    }
+  }
+
+  return summary;
 }
 
 async function availableSlots(env, url) {
@@ -354,6 +588,11 @@ export default {
         response = await availableSlots(env, url);
       } else if (request.method === "POST" && (url.pathname === "/api/bookings" || url.pathname === "/demo_booking/api/bookings")) {
         response = await createBooking(request, env);
+      } else if ((request.method === "GET" || request.method === "POST") && (url.pathname === "/api/reminders" || url.pathname === "/api/reminders/send" || url.pathname === "/demo_booking/api/reminders" || url.pathname === "/demo_booking/api/reminders/send")) {
+        const targetDate = url.searchParams.get("date") || undefined;
+        const force = url.searchParams.get("force") === "true";
+        const summary = await processReminders(env, targetDate, { force });
+        response = json({ ok: true, summary });
       } else {
         const calMatch = url.pathname.match(/^\/(?:demo_booking\/)?api\/bookings\/([a-f0-9-]+)\/calendar\.ics$/i);
         if (request.method === "GET" && calMatch) {
@@ -385,5 +624,17 @@ export default {
       response = json({ error: "The booking service is temporarily unavailable." }, 500);
     }
     return withCors(response, request, env);
+  },
+
+  async scheduled(controller, env, ctx) {
+    const hour = getOttawaHour();
+    console.log(`[Cron] Triggered at hour ${hour} Ottawa time (cron: ${controller?.cron})`);
+    // Runs at 8:00 AM Ottawa time (day before), or if explicit 8am UTC-4 cron matches
+    if (hour === 8 || controller?.cron === "0 12 * * *") {
+      const tomorrow = getTomorrowOttawaDate();
+      console.log(`[Cron] Processing 8 AM reminders for appointments on ${tomorrow}`);
+      const summary = await processReminders(env, tomorrow);
+      console.log(`[Cron] Reminder summary: sent=${summary.sent}, failed=${summary.failed}, total=${summary.total_due}`);
+    }
   },
 };

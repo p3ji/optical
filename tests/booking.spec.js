@@ -120,6 +120,8 @@ test("live mode checks slots and waits for email-confirmed booking", async ({ pa
 test("language toggle switches entire landing page and booking modal to Simplified Chinese", async ({ page }) => {
   const indexUrl = pathToFileURL(join(__dirname, "..", "index.html")).href;
   await page.goto(indexUrl);
+  await page.locator("#demo-modal-btn").click();
+  await expect(page.locator("#demo-modal")).not.toHaveClass(/active/);
   await expect(page.locator(".hero-copy h1")).toContainText("See life");
 
   // Click nav language toggle to switch to Chinese
@@ -137,3 +139,26 @@ test("language toggle switches entire landing page and booking modal to Simplifi
   await expect(page.locator(`${host} #booking-title`)).toHaveText("Where should we see you?");
   await expect(page.locator(`${host} .next`)).toHaveText("Continue");
 });
+
+test("shows demo disclaimer popup on entering page and allows dismissal", async ({ page }) => {
+  const indexUrl = pathToFileURL(join(__dirname, "..", "index.html")).href;
+  await page.goto(indexUrl);
+
+  const modal = page.locator("#demo-modal");
+  await expect(modal).toBeVisible({ timeout: 2000 });
+  await expect(modal.locator("#demo-modal-title")).toHaveText("This is a Demo, Not a Real Clinic");
+  await expect(modal.locator(".demo-modal-text")).toContainText("not affiliated with Chicco Optical");
+
+  // Dismiss via button
+  await page.locator("#demo-modal-btn").click();
+  await expect(modal).not.toHaveClass(/active/);
+
+  // Can be reopened from the footer demo strip
+  await page.locator(".demo-strip").click();
+  await expect(modal).toHaveClass(/active/);
+
+  // Dismiss via close button
+  await page.locator("#demo-modal-close-btn").click();
+  await expect(modal).not.toHaveClass(/active/);
+});
+

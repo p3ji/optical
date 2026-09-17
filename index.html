@@ -136,6 +136,131 @@
         .brand { font-size: 16px; gap: 8px; }
         .brand-logo { width: 42px; height: 42px; border-radius: 11px; }
       }
+
+      /* Demo Disclaimer Pop-up Modal */
+      .demo-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(16, 46, 43, 0.62);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 99999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.22s ease, visibility 0.22s ease;
+      }
+      .demo-modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      .demo-modal-card {
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 34px 30px 28px;
+        max-width: 480px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 24px 64px rgba(16, 46, 43, 0.32);
+        transform: translateY(14px) scale(0.97);
+        transition: transform 0.22s ease;
+      }
+      .demo-modal-overlay.active .demo-modal-card {
+        transform: translateY(0) scale(1);
+      }
+      .demo-modal-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #f4f7f5;
+        border: 1px solid var(--line);
+        font-size: 20px;
+        line-height: 1;
+        color: #556c67;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        transition: all 0.15s ease;
+      }
+      .demo-modal-close:hover {
+        background: var(--ink);
+        color: #ffffff;
+        border-color: var(--ink);
+      }
+      .demo-modal-icon-badge {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: #fff3ee;
+        border: 1px solid #ffd8cc;
+        color: var(--coral);
+        font-size: 24px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 16px;
+      }
+      .demo-modal-badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: var(--coral);
+        margin-bottom: 8px;
+      }
+      .demo-modal-card h3 {
+        font: 800 22px/1.25 "Manrope", sans-serif;
+        letter-spacing: -0.5px;
+        color: var(--ink);
+        margin: 0 0 14px;
+      }
+      .demo-modal-text {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #4b6763;
+        margin: 0 0 24px;
+      }
+      .demo-modal-text strong {
+        color: var(--ink);
+        font-weight: 700;
+      }
+      .demo-modal-btn {
+        width: 100%;
+        background: var(--ink);
+        color: #ffffff;
+        font: 800 14px/1 "DM Sans", sans-serif;
+        border: none;
+        border-radius: 999px;
+        padding: 15px 24px;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(16, 46, 43, 0.2);
+        transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+      }
+      .demo-modal-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(16, 46, 43, 0.26);
+        background: #194641;
+      }
+      @media (max-width: 480px) {
+        .demo-modal-card {
+          padding: 26px 20px 22px;
+          border-radius: 20px;
+        }
+        .demo-modal-card h3 {
+          font-size: 19px;
+        }
+        .demo-modal-text {
+          font-size: 13px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -190,6 +315,21 @@
       </section>
       <div class="demo-strip" data-i18n="demoStrip">Interactive demo · Live appointment booking with email confirmation. No medical information is collected.</div>
     </main>
+
+    <!-- Demo Disclaimer Pop-up Modal -->
+    <div id="demo-modal" class="demo-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="demo-modal-title" aria-hidden="true">
+      <div class="demo-modal-card">
+        <button type="button" class="demo-modal-close" id="demo-modal-close-btn" aria-label="Close demo notice">&times;</button>
+        <div class="demo-modal-icon-badge" aria-hidden="true">⚡</div>
+        <div class="demo-modal-badge" data-i18n="modalBadge">PORTFOLIO DEMONSTRATION</div>
+        <h3 id="demo-modal-title" data-i18n="modalTitle">This is a Demo, Not a Real Clinic</h3>
+        <p class="demo-modal-text" data-i18n="modalBody">
+          This website is an interactive prototype designed to demonstrate modern appointment booking. It is <strong>not affiliated with Chicco Optical</strong>, does not provide medical services, and does not schedule real appointments. Please do not submit real medical records or OHIP data.
+        </p>
+        <button type="button" class="demo-modal-btn" id="demo-modal-btn" data-i18n="modalBtn">I Understand — Explore Demo</button>
+      </div>
+    </div>
+
     <div id="booking" data-chicco-booking></div>
     <script src="./booking-widget.js" data-mode="demo" data-api="https://chicco-booking-api.push-peji.workers.dev" data-email="pejisystems@gmail.com" data-sms="3439982681"></script>
     <script>
@@ -215,7 +355,11 @@
             p3Small: "03 / HUMAN",
             p3H2: "Friendly, expert care",
             p3P: "Comprehensive exams and honest advice from people who love helping you see well.",
-            demoStrip: "Interactive demo · Live appointment booking with email confirmation. No medical information is collected."
+            demoStrip: "Interactive demo · Live appointment booking with email confirmation. No medical information is collected.",
+            modalBadge: "PORTFOLIO DEMONSTRATION",
+            modalTitle: "This is a Demo, Not a Real Clinic",
+            modalBody: "This website is an interactive prototype designed to demonstrate modern appointment booking. It is <strong>not affiliated with Chicco Optical</strong>, does not provide medical services, and does not schedule real appointments. Please do not submit real medical records or OHIP data.",
+            modalBtn: "I Understand — Explore Demo"
           },
           zh: {
             brand: "CHICCO OPTICAL 齐可眼镜",
@@ -237,7 +381,11 @@
             p3Small: "03 / 细致专业",
             p3H2: "亲切贴心的视力健康关怀",
             p3P: "深度全面的视力检查与真诚建议，由经验丰富的验光配镜团队为您竭诚服务。",
-            demoStrip: "交互式演示 · 实时预约与邮件确认，绝不收集安省健康卡 (OHIP) 或敏感医疗数据。"
+            demoStrip: "交互式演示 · 实时预约与邮件确认，绝不收集安省健康卡 (OHIP) 或敏感医疗数据。",
+            modalBadge: "系统演示提示",
+            modalTitle: "本页面仅供功能演示，非真实诊所",
+            modalBody: "本网站为展示在线预约流程的交互式演示原型，<strong>并非 Chicco Optical 官方眼科诊所</strong>，亦不提供实际医疗验光预约服务。请勿在此提交真实病历或安省健康卡 (OHIP) 数据。",
+            modalBtn: "我已知晓 · 继续体验"
           }
         };
 
@@ -278,6 +426,56 @@
             applyLanguage(e.detail.lang);
           }
         });
+
+        // Demo Disclaimer Pop-up Logic
+        const demoModal = document.getElementById("demo-modal");
+        const modalCloseBtn = document.getElementById("demo-modal-close-btn");
+        const modalDismissBtn = document.getElementById("demo-modal-btn");
+
+        function openDemoModal() {
+          if (demoModal) {
+            demoModal.classList.add("active");
+            demoModal.setAttribute("aria-hidden", "false");
+          }
+        }
+
+        function closeDemoModal() {
+          if (demoModal) {
+            demoModal.classList.remove("active");
+            demoModal.setAttribute("aria-hidden", "true");
+            try { sessionStorage.setItem("chicco_demo_dismissed", "true"); } catch (e) {}
+          }
+        }
+
+        if (modalCloseBtn) modalCloseBtn.addEventListener("click", closeDemoModal);
+        if (modalDismissBtn) modalDismissBtn.addEventListener("click", closeDemoModal);
+        if (demoModal) {
+          demoModal.addEventListener("click", (e) => {
+            if (e.target === demoModal) closeDemoModal();
+          });
+        }
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && demoModal?.classList.contains("active")) {
+            closeDemoModal();
+          }
+        });
+
+        // Clickable footer demo strip to reopen notice if desired
+        const demoStrip = document.querySelector(".demo-strip");
+        if (demoStrip) {
+          demoStrip.style.cursor = "pointer";
+          demoStrip.setAttribute("title", "Click to view demo disclaimer notice");
+          demoStrip.addEventListener("click", openDemoModal);
+        }
+
+        let isDismissed = false;
+        try {
+          isDismissed = sessionStorage.getItem("chicco_demo_dismissed") === "true";
+        } catch (e) {}
+
+        if (!isDismissed) {
+          openDemoModal();
+        }
 
         applyLanguage(currentLang);
       })();

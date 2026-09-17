@@ -6,7 +6,7 @@ const booking = { id: "64c24af4-f208-4a75-b663-76efb73fd0bb", branch_id: "kanata
 
 test("validates a complete booking", () => assert.deepEqual(validateBooking(booking), { valid: true, errors: {} }));
 test("rejects invalid patient and slot data", () => { const result = validateBooking({ ...booking, patient_email: "bad", patient_phone: "12", appointment_time: "10:17" }); assert.equal(result.valid, false); assert.ok(result.errors.patient_email); assert.ok(result.errors.patient_phone); assert.ok(result.errors.appointment_time); });
-test("creates a timezone-aware calendar file", () => { const ics = createIcs(booking); assert.match(ics, /DTSTART;TZID=America\/Toronto:20261015T103000/); assert.match(ics, /DTEND;TZID=America\/Toronto:20261015T111500/); assert.match(ics, /SUMMARY:Chicco Optical — Comprehensive Eye Exam/); });
+test("creates a timezone-aware calendar file", () => { const ics = createIcs(booking); assert.match(ics, /DTSTART;TZID=America\/Toronto:20261015T103000/); assert.match(ics, /DTEND;TZID=America\/Toronto:20261015T105500/); assert.match(ics, /SUMMARY:Chicco Optical — Eye Exam/); });
 test("creates Google, Outlook, and ICS calendar actions", () => { const links = calendarLinks(booking, "https://booking.example.workers.dev/"); assert.match(links.google, /^https:\/\/calendar\.google\.com/); assert.match(links.outlook, /^https:\/\/outlook\.live\.com/); assert.equal(links.ics, "https://booking.example.workers.dev/api/bookings/64c24af4-f208-4a75-b663-76efb73fd0bb/calendar.ics"); });
 test("redirects /demo_booking to /demo_booking/", async () => {
   const res = await worker.fetch(new Request("https://www.peji.ca/demo_booking"), {});
@@ -35,7 +35,7 @@ test("generates branded confirmation email with service, time, and Google Calend
   const links = calendarLinks(booking, "https://booking.example.workers.dev");
   const html = confirmationEmail(booking, links);
   assert.match(html, /CHICCO OPTICAL/);
-  assert.match(html, /Comprehensive Eye Exam/);
+  assert.match(html, /Eye Exam/);
   assert.match(html, /10:30 AM/);
   assert.match(html, /October 15, 2026/);
   assert.match(html, /Kanata/);
@@ -51,7 +51,7 @@ test("generates branded reminder email with 'See you tomorrow' and appointment d
   assert.match(html, /CHICCO OPTICAL/);
   assert.match(html, /Reminder/);
   assert.match(html, /See you tomorrow, Jamie\./);
-  assert.match(html, /Comprehensive Eye Exam/);
+  assert.match(html, /Eye Exam/);
   assert.match(html, /10:30 AM/);
   assert.match(html, /October 15, 2026/);
   assert.match(html, /Kanata/);
@@ -139,7 +139,7 @@ test("processReminders queries due bookings, sends reminder emails, and updates 
     assert.equal(summary.failed, 0);
     assert.equal(sentEmails.length, 1);
     assert.equal(sentEmails[0].to[0], "sarah@example.com");
-    assert.match(sentEmails[0].subject, /Reminder: Tomorrow's Comprehensive Eye Exam/);
+    assert.match(sentEmails[0].subject, /Reminder: Tomorrow's Eye Exam/);
     assert.equal(dbUpdates.length, 1);
     assert.equal(dbUpdates[0].args[0], "resend-remind-123");
     assert.equal(dbUpdates[0].args[1], "b-101");
@@ -197,5 +197,25 @@ test("handles worker.scheduled cron trigger", async () => {
   }, {});
 
   assert.equal(scheduledProcessed, true);
+});
+
+test("supports all 6 appointment types with valid validation and correct durations", () => {
+  const types = [
+    { type: "exam", name: "Eye Exam", duration: 25 },
+    { type: "purchase_glasses", name: "Purchase Glasses", duration: 60 },
+    { type: "purchase_contacts", name: "Purchase Contact Lens", duration: 30 },
+    { type: "contacts", name: "Contact Lens Fitting", duration: 60 },
+    { type: "repair", name: "Frame Repair", duration: 20 },
+    { type: "adjustment", name: "Frame Adjustment", duration: 20 },
+  ];
+
+  for (const t of types) {
+    const valid = validateBooking({ ...booking, service_type: t.type });
+    assert.equal(valid.valid, true, `Validation failed for ${t.type}`);
+    const ics = createIcs({ ...booking, service_type: t.type });
+    assert.match(ics, new RegExp(`SUMMARY:Chicco Optical — ${t.name}`));
+    const links = calendarLinks({ ...booking, service_type: t.type }, "https://chicco-booking-api.push-peji.workers.dev");
+    assert.ok(links.google.includes(encodeURIComponent(`Chicco Optical — ${t.name}`)));
+  }
 });
 

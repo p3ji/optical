@@ -7,8 +7,11 @@ const BRANCHES = {
 };
 
 const SERVICES = {
-  exam: { name: "Comprehensive Eye Exam", duration: 45 },
-  contacts: { name: "Contact Lens Fitting", duration: 45 },
+  exam: { name: "Eye Exam", duration: 25 },
+  purchase_glasses: { name: "Purchase Glasses", duration: 60 },
+  purchase_contacts: { name: "Purchase Contact Lens", duration: 30 },
+  contacts: { name: "Contact Lens Fitting", duration: 60 },
+  repair: { name: "Frame Repair", duration: 20 },
   adjustment: { name: "Frame Adjustment", duration: 20 },
 };
 

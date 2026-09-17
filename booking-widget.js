@@ -18,9 +18,12 @@
     { id: "downtown", name: "Downtown", area: "Bank Street", icon: "D", tone: "lilac" },
   ];
   const SERVICES = [
-    { id: "exam", name: "Comprehensive Eye Exam", detail: "A complete vision and eye health check", duration: "45 min" },
-    { id: "contacts", name: "Contact Lens Fitting", detail: "Fit, comfort, and care guidance", duration: "45 min" },
-    { id: "adjustment", name: "Frame Adjustment", detail: "A quick tune-up for your favourite frames", duration: "20 min" },
+    { id: "exam", name: "Eye Exam", detail: "Comprehensive vision testing and eye health check", duration: "25 min", durationMinutes: 25 },
+    { id: "purchase_glasses", name: "Purchase Glasses", detail: "Frame selection, lens consultation, and custom styling", duration: "1 hour", durationMinutes: 60 },
+    { id: "purchase_contacts", name: "Purchase Contact Lens", detail: "Prescription lens ordering and supply re-stock", duration: "30 min", durationMinutes: 30 },
+    { id: "contacts", name: "Contact Lens Fitting", detail: "Trial fitting, corneal check, comfort, and care guidance", duration: "1 hour", durationMinutes: 60 },
+    { id: "repair", name: "Frame Repair", detail: "Hinge repair, screw replacement, and frame fixes", duration: "20 min", durationMinutes: 20 },
+    { id: "adjustment", name: "Frame Adjustment", detail: "Nose pad tuning and fit alignment for comfortable wear", duration: "20 min", durationMinutes: 20 },
   ];
 
   const I18N = {
@@ -90,9 +93,12 @@
         downtown: { name: "Downtown", area: "Bank Street" },
       },
       services: {
-        exam: { name: "Comprehensive Eye Exam", detail: "A complete vision and eye health check", duration: "45 min" },
-        contacts: { name: "Contact Lens Fitting", detail: "Fit, comfort, and care guidance", duration: "45 min" },
-        adjustment: { name: "Frame Adjustment", detail: "A quick tune-up for your favourite frames", duration: "20 min" },
+        exam: { name: "Eye Exam", detail: "Comprehensive vision testing and eye health check", duration: "25 min" },
+        purchase_glasses: { name: "Purchase Glasses", detail: "Frame selection, lens consultation, and custom styling", duration: "1 hour" },
+        purchase_contacts: { name: "Purchase Contact Lens", detail: "Prescription lens ordering and supply re-stock", duration: "30 min" },
+        contacts: { name: "Contact Lens Fitting", detail: "Trial fitting, corneal check, comfort, and care guidance", duration: "1 hour" },
+        repair: { name: "Frame Repair", detail: "Hinge repair, screw replacement, and frame fixes", duration: "20 min" },
+        adjustment: { name: "Frame Adjustment", detail: "Nose pad tuning and fit alignment for comfortable wear", duration: "20 min" },
       },
     },
     zh: {
@@ -161,9 +167,12 @@
         downtown: { name: "Downtown 市中心", area: "Bank Street" },
       },
       services: {
-        exam: { name: "全面眼科验光", detail: "完整视力与眼健康深度检查", duration: "45 分钟" },
-        contacts: { name: "隐形眼镜验配", detail: "度数试戴、舒适度与佩戴护理指导", duration: "45 分钟" },
-        adjustment: { name: "镜框调整与维护", detail: "为您喜爱的镜框快速校准与调适", duration: "20 分钟" },
+        exam: { name: "眼科验光", detail: "全面视力检测与眼健康综合评估", duration: "25 分钟" },
+        purchase_glasses: { name: "购买眼镜", detail: "镜框挑选试戴、镜片咨询与个性化定制", duration: "1 小时" },
+        purchase_contacts: { name: "购买隐形眼镜", detail: "隐形眼镜续订选购与度数核对", duration: "30 分钟" },
+        contacts: { name: "隐形眼镜验配", detail: "试戴定制、角膜测量、舒适度与佩戴指导", duration: "1 小时" },
+        repair: { name: "镜架维修", detail: "铰链修复、螺丝配件更换与镜框加固", duration: "20 分钟" },
+        adjustment: { name: "镜架调适", detail: "鼻托微调、镜腿贴合度校准与舒适优化", duration: "20 分钟" },
       },
     },
   };
@@ -335,7 +344,7 @@
     const s = SERVICES.find(x => x.id === state.service);
     if (!s) return null;
     const localized = t().services[s.id] || {};
-    return { ...s, name: localized.name || s.name, detail: localized.detail || s.detail, duration: localized.duration || s.duration };
+    return { ...s, name: localized.name || s.name, detail: localized.detail || s.detail, duration: localized.duration || s.duration, durationMinutes: s.durationMinutes || 30 };
   }
   function dateLabel() {
     if (!state.date) return "";
@@ -568,7 +577,7 @@
     const smsBody = encodeURIComponent(body);
     const emailBody = encodeURIComponent(body);
     const start = new Date(`${state.date} ${state.time}`);
-    const duration = selectedService()?.id === "adjustment" ? 20 : 45;
+    const duration = selectedService()?.durationMinutes || 30;
     const end = new Date(start.getTime() + duration * 60000);
     const cal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Chicco Optical — ${selectedService()?.name}`)}&dates=${calendarStamp(start)}/${calendarStamp(end)}&details=${encodeURIComponent(`Appointment at Chicco Optical ${selectedBranch()?.name}`)}&location=${encodeURIComponent(selectedBranch()?.area || "")}`;
 

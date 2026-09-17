@@ -20,6 +20,17 @@ test("handles /demo_booking/api/health health check", async () => {
   assert.equal(data.ok, true);
   assert.equal(data.service, "chicco-booking-api");
 });
+test("handles demobooking.peji.ca/api/health check", async () => {
+  const res = await worker.fetch(new Request("https://demobooking.peji.ca/api/health"), {});
+  assert.equal(res.status, 200);
+  const data = await res.json();
+  assert.equal(data.ok, true);
+});
+test("redirects demobooking.peji.ca/demo_booking to root", async () => {
+  const res = await worker.fetch(new Request("https://demobooking.peji.ca/demo_booking"), {});
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get("Location"), "https://demobooking.peji.ca/");
+});
 test("generates branded confirmation email with service, time, and Google Calendar link", () => {
   const links = calendarLinks(booking, "https://booking.example.workers.dev");
   const html = confirmationEmail(booking, links);

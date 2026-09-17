@@ -358,6 +358,15 @@ export default {
         const calMatch = url.pathname.match(/^\/(?:demo_booking\/)?api\/bookings\/([a-f0-9-]+)\/calendar\.ics$/i);
         if (request.method === "GET" && calMatch) {
           response = await calendarFile(env, calMatch[1]);
+        } else if (url.hostname === "demobooking.peji.ca") {
+          if (url.pathname === "/demo_booking" || url.pathname === "/demo_booking/") {
+            return Response.redirect(`${url.origin}/`, 301);
+          }
+          const targetUrl = new URL(`https://p3ji.github.io/optical/demo_booking${url.pathname === "/" ? "/index.html" : url.pathname}`);
+          const fetched = await fetch(targetUrl.toString());
+          const headers = new Headers(fetched.headers);
+          headers.set("Access-Control-Allow-Origin", "*");
+          return new Response(fetched.body, { status: fetched.status, headers });
         } else if (url.pathname === "/demo_booking") {
           return Response.redirect(`${url.origin}/demo_booking/`, 301);
         } else if (url.pathname.startsWith("/demo_booking/")) {

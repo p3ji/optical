@@ -116,3 +116,24 @@ test("live mode checks slots and waits for email-confirmed booking", async ({ pa
   await expect(page.locator(`${host} a`, { hasText: "Google Calendar" })).toHaveAttribute("href", "https://calendar.google.com/test");
   await expect(page.locator(`${host} a`, { hasText: "Apple / ICS" })).toHaveAttribute("href", "https://booking.test/api/bookings/confirmed-123/calendar.ics");
 });
+
+test("language toggle switches entire landing page and booking modal to Simplified Chinese", async ({ page }) => {
+  const indexUrl = pathToFileURL(join(__dirname, "..", "index.html")).href;
+  await page.goto(indexUrl);
+  await expect(page.locator(".hero-copy h1")).toContainText("See life");
+
+  // Click nav language toggle to switch to Chinese
+  await page.locator("#site-lang-toggle").click();
+  await expect(page.locator(".hero-copy h1")).toContainText("清晰视界");
+  await expect(page.locator("[data-i18n='brand']")).toContainText("齐可眼镜");
+
+  // Open modal
+  await page.locator("[data-open-chicco-booking]").first().click();
+  await expect(page.locator(`${host} #booking-title`)).toHaveText("选择就近门店与服务");
+  await expect(page.locator(`${host} .next`)).toHaveText("下一步");
+
+  // Toggle back to English inside the modal
+  await page.locator(`${host} .lang-toggle`).click();
+  await expect(page.locator(`${host} #booking-title`)).toHaveText("Where should we see you?");
+  await expect(page.locator(`${host} .next`)).toHaveText("Continue");
+});

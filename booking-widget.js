@@ -41,8 +41,63 @@
     .footer{min-height:82px;flex:none;border-top:1px solid #edf0ec;display:flex;align-items:center;justify-content:space-between;padding:14px clamp(26px,5vw,56px);gap:12px}.back{border:0;background:transparent;color:#5e736d;font-size:12px;font-weight:800;cursor:pointer;padding:13px 0}.next{border:0;border-radius:999px;background:var(--ink);color:white;padding:14px 21px;min-height:47px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(16,46,43,.16);min-width:128px}.next:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}.next:not(:disabled):hover{transform:translateY(-1px)}
     .success{text-align:center;max-width:530px;margin:0 auto;padding:9px 0}.check{width:78px;height:78px;border-radius:50%;display:grid;place-items:center;background:#dff3ea;color:#287b60;font-size:34px;margin:0 auto 21px;animation:pop .45s cubic-bezier(.2,1.5,.4,1)}@keyframes pop{from{transform:scale(.4);opacity:0}}.success .title{font-size:34px}.success-card{text-align:left;border:1px solid var(--line);border-radius:17px;padding:17px 18px;margin:23px 0 15px;display:grid;grid-template-columns:38px 1fr;gap:11px;background:#fffdf9}.success-card .cal{width:38px;height:38px;background:#f8d9ca;border-radius:10px;display:grid;place-items:center}.success-card b,.success-card small{display:block}.success-card b{font-size:13px;margin-bottom:5px}.success-card small{font-size:11px;color:var(--muted);line-height:1.5}.send-note{font-size:10px;color:#71817d;line-height:1.5;margin:0 auto 18px;max-width:410px}.actions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap}.action{display:inline-flex;align-items:center;gap:7px;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:11px 15px;color:var(--ink);font-size:11px;font-weight:800;background:white}.action.primary-action{background:var(--ink);color:white;border-color:var(--ink)}
     .toast{position:fixed;z-index:2147483002;left:50%;bottom:24px;transform:translate(-50%,20px);background:#102e2b;color:white;padding:12px 18px;border-radius:999px;font-size:11px;font-weight:700;opacity:0;visibility:hidden;transition:.2s;box-shadow:0 12px 35px rgba(0,0,0,.24)}.toast.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
-    @media(max-width:700px){.backdrop{padding:0;align-items:end}.modal{width:100%;height:min(91dvh,820px);border-radius:24px 24px 0 0;display:block}.main{height:100%}.side{display:none}.topbar{min-height:61px;padding:9px 17px}.content{padding:24px 20px 18px}.footer{min-height:74px;padding:10px 20px calc(10px + env(safe-area-inset-bottom))}.branch-grid{grid-template-columns:1fr 1fr}.date-layout{grid-template-columns:1fr;gap:22px}.slot-panel{border-left:0;border-top:1px solid var(--line);padding:19px 0 0}.form-grid{grid-template-columns:1fr;gap:12px}.field.full{grid-column:auto}.fab{height:54px;right:16px;bottom:max(16px,env(safe-area-inset-bottom));padding:0 18px}.title{font-size:29px}.subtitle{margin-bottom:20px}.choice{min-height:77px}.service{grid-template-columns:34px 1fr auto}.content:before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);width:38px;height:4px;border-radius:9px;background:#cfd7d3}}
-    @media(max-width:390px){.branch-grid{grid-template-columns:1fr 1fr}.choice{padding:11px}.badge{margin-bottom:6px}.content{padding-left:16px;padding-right:16px}.footer{padding-left:16px;padding-right:16px}.fab span{display:none}.fab{width:54px;padding:0;justify-content:center}}
+    @media(max-width:700px){
+      .backdrop{padding:0;align-items:flex-end}
+      .modal{position:relative;width:100%;height:min(92dvh,820px);max-height:92dvh;border-radius:24px 24px 0 0;display:flex;flex-direction:column;overflow:hidden}
+      .modal:before{content:"";position:absolute;top:9px;left:50%;transform:translateX(-50%);width:40px;height:4px;border-radius:999px;background:#cfd7d3;z-index:20}
+      .main{flex:1 1 auto;min-height:0;height:auto;display:flex;flex-direction:column}
+      .side{display:none}
+      .topbar{min-height:56px;padding:14px 18px 8px}
+      .content{padding:14px 18px 20px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+      .title{font-size:22px;letter-spacing:-0.7px}
+      .subtitle{font-size:13px;margin:5px 0 14px}
+      .kicker{margin:0 0 4px;font-size:10px}
+      .section-label{margin:12px 0 7px;font-size:11px}
+      .branch-grid{grid-template-columns:1fr 1fr;gap:7px}
+      .choice.branch{min-height:54px;padding:8px 10px;display:flex;align-items:center;gap:9px}
+      .choice.branch .badge{width:26px;height:26px;margin-bottom:0;flex:none;font-size:10px}
+      .choice.branch b{font-size:12px;line-height:1.2}
+      .choice.branch small{font-size:9px;margin-top:1px}
+      .choice.branch:last-child:nth-child(odd){grid-column:1 / -1}
+      .service-list{gap:7px}
+      .service{min-height:54px;padding:9px 11px;grid-template-columns:30px 1fr auto;gap:9px}
+      .service-icon{width:30px;height:30px;font-size:12px}
+      .service b{font-size:12px}
+      .service small{font-size:10px}
+      .service .duration{font-size:10px;margin-right:16px}
+      .date-layout{grid-template-columns:1fr;gap:16px}
+      .month-head{margin-bottom:8px}
+      .month-head b{font-size:13px}
+      .month-head button{width:32px;height:32px}
+      .week span{font-size:8.5px;padding:5px 0}
+      .day{font-size:12px}
+      .slot-panel{border-left:0;border-top:1px solid var(--line);padding:16px 0 0}
+      .slot-title{font-size:12px;font-weight:800;margin-bottom:10px}
+      .slots{grid-template-columns:repeat(2,1fr);gap:8px}
+      .time{padding:12px 6px;font-size:12px;font-weight:700;border-radius:10px}
+      .form-grid{grid-template-columns:1fr;gap:10px}
+      .field.full{grid-column:auto}
+      .field label{font-size:11px}
+      .field input{font-size:16px;min-height:46px;border-radius:10px;padding:0 12px}
+      .privacy{padding:11px 12px;font-size:10px}
+      .summary{margin-top:14px;padding:12px}
+      .footer{min-height:68px;padding:10px 18px calc(10px + env(safe-area-inset-bottom))}
+      .back{padding:10px 0;font-size:12px}
+      .next{min-height:46px;padding:12px 20px;font-size:13px}
+      .fab{height:54px;right:16px;bottom:max(16px,env(safe-area-inset-bottom));padding:0 18px}
+      .check{width:62px;height:62px;font-size:26px;margin-bottom:14px}
+      .success-card{padding:14px;margin:16px 0 12px}
+      .actions{gap:8px;flex-direction:column}
+      .action{width:100%;justify-content:center;padding:12px 16px;font-size:12px}
+    }
+    @media(max-width:390px){
+      .branch-grid{grid-template-columns:1fr 1fr;gap:6px}
+      .choice.branch{padding:7px 8px;min-height:50px}
+      .content{padding-left:14px;padding-right:14px}
+      .footer{padding-left:14px;padding-right:14px}
+      .fab span{display:none}
+      .fab{width:54px;padding:0;justify-content:center}
+    }
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
   `;
 
@@ -90,6 +145,7 @@
     if (state.step===1) content.innerHTML = datePane();
     if (state.step===2) content.innerHTML = detailsPane();
     if (state.step===3) content.innerHTML = successPane();
+    $(".footer").hidden = state.step===3;
     $(".back").hidden = state.step===0 || state.step===3;
     $(".next").hidden = state.step===3;
     $(".next").textContent = state.step===2 ? "Confirm booking" : "Continue";
@@ -117,20 +173,69 @@
     return `<div class="pane"><p class="kicker">Step 3 of 3</p><h1 class="title" id="booking-title">A few final details.</h1><p class="subtitle">We'll use these only for your appointment confirmation and reminder.</p><form class="form-grid" novalidate><div class="field full"><label for="patient-name">Full name</label><input id="patient-name" name="name" autocomplete="name" placeholder="e.g. Alex Chen" value="${esc(state.name)}"/><span class="error" data-error="name"></span></div><div class="field"><label for="patient-email">Email</label><input id="patient-email" name="email" type="email" autocomplete="email" placeholder="alex@example.com" value="${esc(state.email)}"/><span class="error" data-error="email"></span></div><div class="field"><label for="patient-phone">Mobile number</label><input id="patient-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(613) 555-0123" value="${esc(state.phone)}"/><span class="error" data-error="phone"></span></div></form><div class="privacy"><span>♢</span><div><b>Your privacy matters.</b><br/>We never ask for medical details or an OHIP number here. Your contact details are used only to coordinate this visit.</div></div><div class="summary"><span class="cal">◫</span><span><b>${esc(selectedService()?.name)} · ${esc(selectedBranch()?.name)}</b><small>${dateLabel()} at ${esc(state.time)}</small></span></div></div>`;
   }
   function successPane() {
-    if(state.confirmation){const links=state.confirmation.calendar||{};return `<div class="pane success"><div class="check">✓</div><p class="kicker">Appointment confirmed</p><h1 class="title" id="booking-title">You're booked, ${esc(state.name.split(" ")[0])}.</h1><p class="subtitle">A confirmation email has been sent to ${esc(state.email)}.</p><div class="success-card"><span class="cal">◫</span><span><b>${esc(selectedService()?.name)} at ${esc(selectedBranch()?.name)}</b><small>${dateLabel()} · ${esc(state.time)}<br/>Booking reference: ${esc(state.confirmation.appointment_id)}</small></span></div><p class="send-note">Add the confirmed appointment to your preferred calendar.</p><div class="actions">${links.google?`<a class="action primary-action" target="_blank" rel="noopener" href="${esc(links.google)}">＋ Google Calendar</a>`:""}${links.outlook?`<a class="action" target="_blank" rel="noopener" href="${esc(links.outlook)}">＋ Outlook</a>`:""}${links.ics?`<a class="action" href="${esc(links.ics)}">↓ Apple / ICS</a>`:""}</div></div>`;}
+    if(state.confirmation){const links=state.confirmation.calendar||{};return `<div class="pane success"><div class="check">✓</div><p class="kicker">Appointment confirmed</p><h1 class="title" id="booking-title">You're booked, ${esc(state.name.split(" ")[0])}.</h1><p class="subtitle">A confirmation email has been sent to ${esc(state.email)}.</p><div class="success-card"><span class="cal">◫</span><span><b>${esc(selectedService()?.name)} at ${esc(selectedBranch()?.name)}</b><small>${dateLabel()} · ${esc(state.time)}<br/>Booking reference: ${esc(state.confirmation.appointment_id)}</small></span></div><p class="send-note">Add the confirmed appointment to your preferred calendar.</p><div class="actions">${links.google?`<a class="action primary-action" target="_blank" rel="noopener" href="${esc(links.google)}">＋ Google Calendar</a>`:""}${links.outlook?`<a class="action" target="_blank" rel="noopener" href="${esc(links.outlook)}">＋ Outlook</a>`:""}${links.ics?`<a class="action" href="${esc(links.ics)}">↓ Apple / ICS</a>`:""}<button class="action" data-close-dialog style="margin-top:6px;background:#102e2b;color:white;cursor:pointer">Done</button></div></div>`;}
     const body = bookingText(); const subject=encodeURIComponent(`New booking request — ${state.name} — ${dateLabel()}`); const smsBody=encodeURIComponent(body); const emailBody=encodeURIComponent(body);
     const start = new Date(`${state.date} ${state.time}`); const duration=selectedService()?.id==="adjustment"?20:45; const end=new Date(start.getTime()+duration*60000); const cal=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Chicco Optical — ${selectedService()?.name}`)}&dates=${calendarStamp(start)}/${calendarStamp(end)}&details=${encodeURIComponent(`Appointment at Chicco Optical ${selectedBranch()?.name}`)}&location=${encodeURIComponent(selectedBranch()?.area||"")}`;
-    return `<div class="pane success"><div class="check">✓</div><p class="kicker">Request prepared</p><h1 class="title" id="booking-title">You're ready, ${esc(state.name.split(" ")[0])}.</h1><p class="subtitle">This demo prepares the booking for the coordinator. Use either button below to send it.</p><div class="success-card"><span class="cal">◫</span><span><b>${esc(selectedService()?.name)} at ${esc(selectedBranch()?.name)}</b><small>${dateLabel()} · ${esc(state.time)}<br/>Confirmation to ${esc(state.email)} and ${esc(state.phone)}</small></span></div><p class="send-note">Demo mode never silently sends your information. Your email or messaging app will open with the booking prefilled for review.</p><div class="actions"><a class="action primary-action" href="mailto:${config.email}?subject=${subject}&body=${emailBody}">✉ Email booking</a><a class="action" href="sms:${config.sms}?body=${smsBody}">▣ Text booking</a><a class="action" target="_blank" rel="noopener" href="${cal}">＋ Add to calendar</a></div></div>`;
+    return `<div class="pane success"><div class="check">✓</div><p class="kicker">Request prepared</p><h1 class="title" id="booking-title">You're ready, ${esc(state.name.split(" ")[0])}.</h1><p class="subtitle">This demo prepares the booking for the coordinator. Use either button below to send it.</p><div class="success-card"><span class="cal">◫</span><span><b>${esc(selectedService()?.name)} at ${esc(selectedBranch()?.name)}</b><small>${dateLabel()} · ${esc(state.time)}<br/>Confirmation to ${esc(state.email)} and ${esc(state.phone)}</small></span></div><p class="send-note">Demo mode never silently sends your information. Your email or messaging app will open with the booking prefilled for review.</p><div class="actions"><a class="action primary-action" href="mailto:${config.email}?subject=${subject}&body=${emailBody}">✉ Email booking</a><a class="action" href="sms:${config.sms}?body=${smsBody}">▣ Text booking</a><a class="action" target="_blank" rel="noopener" href="${cal}">＋ Add to calendar</a><button class="action" data-close-dialog style="margin-top:6px;background:#102e2b;color:white;cursor:pointer">Done</button></div></div>`;
   }
   function calendarStamp(d){return d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");}
   function bookingText(){return `New Chicco Optical booking request\n\nPatient: ${state.name}\nEmail: ${state.email}\nMobile: ${state.phone}\nLocation: ${selectedBranch()?.name} (${selectedBranch()?.area})\nService: ${selectedService()?.name}\nDate: ${dateLabel()}\nTime: ${state.time}\n\nSubmitted from the Chicco booking demo.`;}
   function canContinue(){if(state.step===0)return !!state.branch&&!!state.service;if(state.step===1)return !!state.date&&!!state.time;if(state.step===2)return valid(false);return false;}
   function valid(show=true){const goodName=state.name.trim().length>=2;const goodEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.email);const digits=state.phone.replace(/\D/g,"");const goodPhone=digits.length>=10&&digits.length<=15;if(show){const set=(k,m)=>{const e=root.querySelector(`[data-error="${k}"]`);if(e)e.textContent=m};set("name",goodName?"":"Please enter your name");set("email",goodEmail?"":"Enter a valid email");set("phone",goodPhone?"":"Enter a valid mobile number");}return goodName&&goodEmail&&goodPhone;}
-  async function loadAvailability(date){if(!config.apiBase)return;state.slotsLoading=true;state.liveSlots=null;render();try{const params=new URLSearchParams({branch_id:state.branch,date,service_type:state.service});const response=await fetch(`${config.apiBase}/api/slots?${params}`);const result=await response.json();if(!response.ok)throw new Error(result.error||"Availability could not be loaded.");state.liveSlots=result.slots||[];}catch(error){state.liveSlots=[];toast(error.message||"Availability could not be loaded.");}finally{state.slotsLoading=false;render();}}
+  async function loadAvailability(date){
+    if(!config.apiBase)return;
+    state.slotsLoading=true;
+    state.liveSlots=null;
+    render();
+    try{
+      const params=new URLSearchParams({branch_id:state.branch,date,service_type:state.service});
+      const response=await fetch(`${config.apiBase}/api/slots?${params}`);
+      const result=await response.json();
+      if(!response.ok)throw new Error(result.error||"Availability could not be loaded.");
+      state.liveSlots=result.slots||[];
+    }catch(error){
+      state.liveSlots=[];
+      toast(error.message||"Availability could not be loaded.");
+    }finally{
+      state.slotsLoading=false;
+      render();
+      if(window.innerWidth <= 700){
+        setTimeout(() => {
+          const slotPanel = root.querySelector(".slot-panel");
+          if(slotPanel) slotPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 60);
+      }
+    }
+  }
   function bindPane(){
-    $$(".branch").forEach(b=>b.addEventListener("click",()=>{state.branch=b.dataset.id;render()}));$$(".service").forEach(b=>b.addEventListener("click",()=>{state.service=b.dataset.id;render()}));
-    $$("[data-month]").forEach(b=>b.addEventListener("click",()=>{monthOffset+=Number(b.dataset.month);state.date=null;state.time=null;state.liveSlots=null;render()}));$$("[data-date]").forEach(b=>b.addEventListener("click",()=>{state.date=b.dataset.date;state.time=null;state.liveSlots=null;if(config.apiBase)loadAvailability(state.date);else render()}));$$("[data-time]").forEach(b=>b.addEventListener("click",()=>{state.time=b.dataset.time;render()}));
+    $$(".branch").forEach(b=>b.addEventListener("click",()=>{
+      state.branch=b.dataset.id;
+      render();
+      if(window.innerWidth <= 700){
+        setTimeout(() => {
+          const serviceHeader = root.querySelector(".service-list");
+          if(serviceHeader) serviceHeader.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 50);
+      }
+    }));
+    $$(".service").forEach(b=>b.addEventListener("click",()=>{state.service=b.dataset.id;render()}));
+    $$("[data-month]").forEach(b=>b.addEventListener("click",()=>{monthOffset+=Number(b.dataset.month);state.date=null;state.time=null;state.liveSlots=null;render()}));
+    $$("[data-date]").forEach(b=>b.addEventListener("click",()=>{
+      state.date=b.dataset.date;
+      state.time=null;
+      state.liveSlots=null;
+      if(config.apiBase) loadAvailability(state.date);
+      else render();
+      if(window.innerWidth <= 700){
+        setTimeout(() => {
+          const slotPanel = root.querySelector(".slot-panel");
+          if(slotPanel) slotPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }, 60);
+      }
+    }));
+    $$("[data-time]").forEach(b=>b.addEventListener("click",()=>{state.time=b.dataset.time;render()}));
     $$('input').forEach(input=>input.addEventListener("input",()=>{state[input.name]=input.value;$(".next").disabled=!canContinue();}));
+    $$("[data-close-dialog]").forEach(btn => btn.addEventListener("click", close));
   }
   async function continueFlow(){
     if(state.step===2&&!valid(true))return;

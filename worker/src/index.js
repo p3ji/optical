@@ -77,12 +77,182 @@ export function calendarLinks(booking, publicApiUrl) {
 
 function escapeHtml(value) { return String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]); }
 function formatTime(time) { const [hour, minute] = time.split(":").map(Number); return `${hour % 12 || 12}:${pad(minute)} ${hour >= 12 ? "PM" : "AM"}`; }
+function formatPhone(value) { const n = String(value || "").replace(/\D/g, ""); return n.length === 10 ? `(${n.slice(0, 3)}) ${n.slice(3, 6)}-${n.slice(6)}` : value; }
 
-function confirmationEmail(booking, links) {
+export function confirmationEmail(booking, links) {
   const branch = BRANCHES[booking.branch_id];
   const service = SERVICES[booking.service_type];
-  const formattedDate = new Intl.DateTimeFormat("en-CA", { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(new Date(`${booking.appointment_date}T12:00:00Z`));
-  return `<!doctype html><html><body style="margin:0;background:#f6f1e8;font-family:Arial,sans-serif;color:#102e2b"><table width="100%" cellpadding="0" cellspacing="0" role="presentation"><tr><td align="center" style="padding:32px 16px"><table width="100%" style="max-width:600px;background:#fff;border-radius:20px;overflow:hidden" cellpadding="0" cellspacing="0" role="presentation"><tr><td style="background:#102e2b;color:#fff;padding:26px 32px;font-size:20px;font-weight:700">CHICCO OPTICAL</td></tr><tr><td style="padding:32px"><p style="color:#df6146;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">Appointment confirmed</p><h1 style="margin:8px 0 14px;font-size:30px">We'll see you soon, ${escapeHtml(booking.patient_name.split(" ")[0])}.</h1><p style="color:#5f7470;line-height:1.6">Your appointment is booked. Keep this email for your records.</p><div style="margin:24px 0;padding:20px;background:#f7f8f5;border-radius:14px"><strong>${escapeHtml(service.name)}</strong><br><span style="color:#5f7470;line-height:1.8">${escapeHtml(branch.name)} · ${escapeHtml(branch.area)}<br>${escapeHtml(formattedDate)} at ${escapeHtml(formatTime(booking.appointment_time))}</span></div><p><a href="${links.google}" style="display:inline-block;background:#102e2b;color:#fff;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:700">Add to Google Calendar</a> <a href="${links.ics}" style="display:inline-block;color:#102e2b;text-decoration:none;padding:13px 10px;font-weight:700">Download calendar file</a></p><p style="margin-top:28px;color:#70807c;font-size:12px;line-height:1.5">Need to make a change? Reply to this email or contact Chicco Optical.</p></td></tr></table></td></tr></table></body></html>`;
+  const formattedDate = new Intl.DateTimeFormat("en-CA", { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "America/Toronto" }).format(new Date(`${booking.appointment_date}T12:00:00Z`));
+  const formattedTime = formatTime(booking.appointment_time);
+  const firstName = escapeHtml(String(booking.patient_name || "").trim().split(" ")[0]);
+  const fullName = escapeHtml(String(booking.patient_name || "").trim());
+  const phoneFormatted = formatPhone(booking.patient_phone);
+  const logoSrc = "https://p3ji.github.io/optical/demo_booking/assets/chicco-logo.png";
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chicco Optical Appointment Confirmation</title>
+</head>
+<body style="margin:0;padding:0;background:#f6f1e8;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#102e2b;-webkit-font-smoothing:antialiased">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f6f1e8;padding:32px 16px">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;background:#ffffff;border-radius:24px;overflow:hidden;border:1px solid #e4eae4;box-shadow:0 12px 36px rgba(16,46,43,0.08)">
+          <tr>
+            <td style="background:#102e2b;padding:24px 32px">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td style="vertical-align:middle">
+                    <table cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td style="vertical-align:middle;padding-right:12px">
+                          <img src="${logoSrc}" width="44" height="44" alt="Chicco Optical" style="display:block;border-radius:11px;background:#f6f1e8;border:0">
+                        </td>
+                        <td style="vertical-align:middle">
+                          <span style="display:block;font-family:'Manrope',Arial,sans-serif;font-size:18px;font-weight:800;letter-spacing:1px;color:#ffffff;line-height:1.2">CHICCO OPTICAL</span>
+                          <span style="display:block;font-size:11px;color:#9fd8c8;letter-spacing:0.5px;font-weight:500">Ottawa's Neighbourhood Opticians</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="vertical-align:middle">
+                    <span style="display:inline-block;background:rgba(159,216,200,0.16);border:1px solid rgba(159,216,200,0.3);color:#9fd8c8;font-size:10px;font-weight:800;letter-spacing:1.5px;padding:6px 12px;border-radius:999px;text-transform:uppercase">Confirmed</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:36px 32px 28px">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td>
+                    <p style="margin:0 0 8px;color:#ed6b4d;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase">Appointment Confirmed</p>
+                    <h1 style="margin:0 0 12px;font-family:'Manrope',Arial,sans-serif;font-size:27px;font-weight:800;color:#102e2b;line-height:1.2">We'll see you soon, ${firstName}.</h1>
+                    <p style="margin:0 0 24px;color:#4b6763;font-size:14px;line-height:1.6">Your visit has been reserved in our clinic calendar. Please find your appointment details and calendar link below.</p>
+                  </td>
+                </tr>
+              </table>
+
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#fbf8f2;border:1px solid #dfe5df;border-radius:18px;margin-bottom:26px;overflow:hidden">
+                <tr>
+                  <td style="padding:22px">
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:16px">
+                      <tr>
+                        <td>
+                          <span style="display:block;color:#ed6b4d;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">Selected Service</span>
+                          <span style="display:block;font-family:'Manrope',Arial,sans-serif;font-size:18px;font-weight:800;color:#102e2b">${escapeHtml(service.name)}</span>
+                          <span style="display:block;font-size:12px;color:#657873;margin-top:2px">${service.duration} min duration</span>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <div style="border-top:1px solid #e5ebe7;margin-bottom:16px"></div>
+
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:16px">
+                      <tr>
+                        <td width="42" style="vertical-align:top;padding-right:12px">
+                          <div style="width:40px;height:40px;border-radius:10px;background:#f8d9ca;text-align:center;line-height:40px;font-size:17px">📅</div>
+                        </td>
+                        <td style="vertical-align:top">
+                          <span style="display:block;color:#657873;font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:3px">Date & Time</span>
+                          <span style="display:block;font-size:15px;font-weight:700;color:#102e2b">${escapeHtml(formattedDate)}</span>
+                          <span style="display:block;font-size:13px;font-weight:700;color:#ed6b4d;margin-top:2px">${escapeHtml(formattedTime)} EDT</span>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <div style="border-top:1px solid #e5ebe7;margin-bottom:16px"></div>
+
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td width="42" style="vertical-align:top;padding-right:12px">
+                          <div style="width:40px;height:40px;border-radius:10px;background:#d7eee7;text-align:center;line-height:40px;font-size:17px">📍</div>
+                        </td>
+                        <td style="vertical-align:top">
+                          <span style="display:block;color:#657873;font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:3px">Ottawa Clinic Location</span>
+                          <span style="display:block;font-size:15px;font-weight:700;color:#102e2b">${escapeHtml(branch.name)}</span>
+                          <span style="display:block;font-size:12px;color:#657873;margin-top:2px">${escapeHtml(branch.area)} · Ottawa, ON</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="background:#f4f7f4;border-top:1px solid #dfe5df;padding:12px 22px">
+                    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td style="font-size:11px;color:#4b6763">
+                          Patient: <b>${fullName}</b> · ${escapeHtml(phoneFormatted)}
+                        </td>
+                        <td align="right" style="font-size:10px;color:#718985">
+                          Ref: <code style="font-family:monospace;background:#ffffff;padding:2px 5px;border-radius:4px;border:1px solid #dfe5df">${escapeHtml(String(booking.id || "").slice(0, 13))}</code>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:24px">
+                <tr>
+                  <td>
+                    <span style="display:block;font-size:12px;font-weight:700;color:#102e2b;margin-bottom:12px">Add to your calendar:</span>
+                    <table cellpadding="0" cellspacing="0" role="presentation">
+                      <tr>
+                        <td style="padding-right:10px">
+                          <a href="${escapeHtml(links.google)}" target="_blank" style="display:inline-block;background:#102e2b;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:13px 22px;border-radius:999px;box-shadow:0 6px 16px rgba(16,46,43,0.18)">＋ Add to Google Calendar</a>
+                        </td>
+                        <td>
+                          <a href="${escapeHtml(links.ics)}" style="display:inline-block;background:#ffffff;color:#102e2b;border:1px solid #dfe5df;text-decoration:none;font-size:12px;font-weight:700;padding:12px 18px;border-radius:999px">Download Apple / ICS</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#edf7f3;border-left:4px solid #9fd8c8;border-radius:10px">
+                <tr>
+                  <td style="padding:14px 16px;font-size:12px;color:#2c524b;line-height:1.6">
+                    <b>Before your appointment:</b><br>
+                    • Please arrive 10 minutes early to complete check-in.<br>
+                    • Bring your current eyeglasses, sunglasses, or contact lens boxes if available.<br>
+                    • No medical card or OHIP details are required in advance.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="background:#f7f9f7;border-top:1px solid #edf0ec;padding:24px 32px">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td>
+                    <p style="margin:0 0 6px;font-size:12px;color:#4b6763;line-height:1.5">
+                      Need to reschedule or make a change? Reply to this email or call/text coordinator at <a href="tel:3439982681" style="color:#102e2b;font-weight:700;text-decoration:none">343-998-2681</a>.
+                    </p>
+                    <p style="margin:8px 0 0;font-size:11px;color:#7e8f8b;line-height:1.5">
+                      Chicco Optical · Five Ottawa Locations: Kanata · Barrhaven · Merivale · Riverside South · Downtown
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
 }
 
 async function sendConfirmation(env, booking, links) {

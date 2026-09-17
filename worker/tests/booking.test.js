@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import worker, { calendarLinks, createIcs, validateBooking } from "../src/index.js";
+import worker, { calendarLinks, createIcs, validateBooking, confirmationEmail } from "../src/index.js";
 
 const booking = { id: "64c24af4-f208-4a75-b663-76efb73fd0bb", branch_id: "kanata", patient_name: "Jamie Demo", patient_email: "jamie@example.com", patient_phone: "6135550123", service_type: "exam", appointment_date: "2026-10-15", appointment_time: "10:30" };
 
@@ -19,4 +19,16 @@ test("handles /demo_booking/api/health health check", async () => {
   const data = await res.json();
   assert.equal(data.ok, true);
   assert.equal(data.service, "chicco-booking-api");
+});
+test("generates branded confirmation email with service, time, and Google Calendar link", () => {
+  const links = calendarLinks(booking, "https://booking.example.workers.dev");
+  const html = confirmationEmail(booking, links);
+  assert.match(html, /CHICCO OPTICAL/);
+  assert.match(html, /Comprehensive Eye Exam/);
+  assert.match(html, /10:30 AM/);
+  assert.match(html, /October 15, 2026/);
+  assert.match(html, /Kanata/);
+  assert.match(html, /Add to Google Calendar/);
+  assert.match(html, /calendar\.google\.com\/calendar\/render/);
+  assert.match(html, /chicco-logo\.png/);
 });

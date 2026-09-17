@@ -1,0 +1,15 @@
+name = "chicco-booking-api"
+main = "src/index.js"
+compatibility_date = "2026-09-16"
+
+[vars]
+ALLOWED_ORIGINS = "https://p3ji.github.io,https://www.peji.com,http://localhost:4173"
+COORDINATOR_EMAIL = "pejisystems@gmail.com"
+BOOKING_FROM_EMAIL = "Chicco Optical <bookings@peji.com>"
+PUBLIC_API_URL = "https://chicco-booking-api.push-peji.workers.dev"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "chicco-bookings"
+database_id = "1b19eb1d-128d-4781-85d0-cc2589bec35a"
+migrations_dir = "migrations"

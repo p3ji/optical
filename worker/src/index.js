@@ -86,9 +86,40 @@ function confirmationEmail(booking, links) {
 }
 
 async function sendConfirmation(env, booking, links) {
-  const response = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: env.BOOKING_FROM_EMAIL, to: [booking.patient_email], bcc: [env.COORDINATOR_EMAIL || "pejisystems@gmail.com"], reply_to: env.COORDINATOR_EMAIL || "pejisystems@gmail.com", subject: `Confirmed: ${SERVICES[booking.service_type].name} at Chicco Optical`, html: confirmationEmail(booking, links) }) });
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.message || "Confirmation email could not be sent.");
+  const fromAddress = env.BOOKING_FROM_EMAIL || "Chicco Optical <bookings@peji.ca>";
+  const coordinator = env.COORDINATOR_EMAIL || "pejisystems@gmail.com";
+  const payload = {
+    from: fromAddress,
+    to: [booking.patient_email],
+    bcc: [coordinator],
+    reply_to: coordinator,
+    subject: `Confirmed: ${SERVICES[booking.service_type].name} at Chicco Optical`,
+    html: confirmationEmail(booking, links),
+  };
+
+  let response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  let result = await response.json();
+
+  // If custom domain is not yet verified in Resend, fall back to onboarding@resend.dev for test bookings to the coordinator
+  if (!response.ok && String(result.message || "").toLowerCase().includes("not verified") && booking.patient_email === coordinator) {
+    console.warn("Custom domain not verified on Resend; falling back to onboarding@resend.dev for coordinator test booking");
+    payload.from = "Chicco Optical <onboarding@resend.dev>";
+    response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    result = await response.json();
+  }
+
+  if (!response.ok) {
+    console.error("Resend API rejection:", JSON.stringify(result));
+    throw new Error(result.message || "Confirmation email could not be sent.");
+  }
   return result.id;
 }
 
@@ -128,7 +159,8 @@ async function createBooking(request, env) {
     const emailId = await sendConfirmation(env, booking, links);
     await env.DB.prepare("UPDATE bookings SET status = 'CONFIRMED', resend_email_id = ? WHERE id = ?").bind(emailId, booking.id).run();
     return json({ success: true, appointment_id: booking.id, details: booking, calendar: links });
-  } catch {
+  } catch (err) {
+    console.error("Booking confirmation failed:", err);
     await env.DB.prepare("UPDATE bookings SET status = 'EMAIL_FAILED' WHERE id = ?").bind(booking.id).run();
     return json({ error: "The appointment could not be confirmed by email. Please try again.", code: "EMAIL_FAILED" }, 502);
   }
@@ -146,10 +178,29 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(request, env) });
     let response;
     try {
-      if (request.method === "GET" && url.pathname === "/api/health") response = json({ ok: true, service: "chicco-booking-api" });
-      else if (request.method === "GET" && url.pathname === "/api/slots") response = await availableSlots(env, url);
-      else if (request.method === "POST" && url.pathname === "/api/bookings") response = await createBooking(request, env);
-      else { const match = url.pathname.match(/^\/api\/bookings\/([a-f0-9-]+)\/calendar\.ics$/i); response = request.method === "GET" && match ? await calendarFile(env, match[1]) : json({ error: "Not found." }, 404); }
+      if (request.method === "GET" && (url.pathname === "/api/health" || url.pathname === "/demo_booking/api/health")) {
+        response = json({ ok: true, service: "chicco-booking-api" });
+      } else if (request.method === "GET" && (url.pathname === "/api/slots" || url.pathname === "/demo_booking/api/slots")) {
+        response = await availableSlots(env, url);
+      } else if (request.method === "POST" && (url.pathname === "/api/bookings" || url.pathname === "/demo_booking/api/bookings")) {
+        response = await createBooking(request, env);
+      } else {
+        const calMatch = url.pathname.match(/^\/(?:demo_booking\/)?api\/bookings\/([a-f0-9-]+)\/calendar\.ics$/i);
+        if (request.method === "GET" && calMatch) {
+          response = await calendarFile(env, calMatch[1]);
+        } else if (url.pathname === "/demo_booking") {
+          return Response.redirect(`${url.origin}/demo_booking/`, 301);
+        } else if (url.pathname.startsWith("/demo_booking/")) {
+          const subpath = url.pathname.slice("/demo_booking".length);
+          const targetUrl = new URL(`https://p3ji.github.io/optical/demo_booking${subpath === "/" ? "/index.html" : subpath}`);
+          const fetched = await fetch(targetUrl.toString());
+          const headers = new Headers(fetched.headers);
+          headers.set("Access-Control-Allow-Origin", "*");
+          return new Response(fetched.body, { status: fetched.status, headers });
+        } else {
+          response = json({ error: "Not found." }, 404);
+        }
+      }
     } catch (error) {
       console.error(error);
       response = json({ error: "The booking service is temporarily unavailable." }, 500);

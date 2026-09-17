@@ -48,10 +48,11 @@ The Cloudflare Worker, D1, Google Calendar, Resend, and Twilio services are the 
 
 ## Live booking backend
 
-The `worker/` folder contains a deployable Cloudflare Worker and D1 migration for real slot locking and Resend confirmation emails. Confirmations include Google Calendar, Outlook, and Apple/ICS actions. See [`worker/README.md`](worker/README.md) for provisioning; the public widget remains in safe handoff mode until its `data-api` attribute points to the deployed Worker.
+The `worker/` folder contains a Cloudflare Worker with D1 storage for slot locking and Resend confirmation emails. Confirmations include Google Calendar, Outlook, and Apple/ICS actions. The public widget connects to the live backend via `data-api="https://chicco-booking-api.push-peji.workers.dev"`.
 
 ## Deployment
 
-Pushes to `main` publish a GitHub Pages artifact with the demo under `/demo_booking/`. The repository Pages URL is the immediately available host; `https://www.peji.com/demo_booking/` additionally requires the `www.peji.com` DNS record and Pages custom-domain setting to point to GitHub Pages.
-
-Live demo: [https://p3ji.github.io/optical/demo_booking/](https://p3ji.github.io/optical/demo_booking/)
+Pushes to `main` publish a GitHub Pages artifact with the demo under `/demo_booking/`.
+- GitHub Pages live demo: [https://p3ji.github.io/optical/demo_booking/](https://p3ji.github.io/optical/demo_booking/)
+- Custom URL: `https://www.peji.ca/demo_booking/` (routed via Cloudflare Worker reverse-proxy to GitHub Pages).
+- Live booking API: `https://chicco-booking-api.push-peji.workers.dev`

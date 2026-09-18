@@ -35,6 +35,8 @@ test("generates branded confirmation email with service, time, and Google Calend
   const links = calendarLinks(booking, "https://booking.example.workers.dev");
   const html = confirmationEmail(booking, links);
   assert.match(html, /CHICCO OPTICAL/);
+  assert.match(html, /DEMO NOTICE: This is a prototype demonstration/);
+  assert.match(html, /PORTFOLIO DEMONSTRATION ONLY/);
   assert.match(html, /Eye Exam/);
   assert.match(html, /10:30 AM/);
   assert.match(html, /October 15, 2026/);
@@ -49,6 +51,8 @@ test("generates branded reminder email with 'See you tomorrow' and appointment d
   const links = calendarLinks(booking, "https://booking.example.workers.dev");
   const html = reminderEmail(booking, links);
   assert.match(html, /CHICCO OPTICAL/);
+  assert.match(html, /DEMO NOTICE: This is a prototype demonstration/);
+  assert.match(html, /PORTFOLIO DEMONSTRATION ONLY/);
   assert.match(html, /Reminder/);
   assert.match(html, /See you tomorrow, Jamie\./);
   assert.match(html, /Eye Exam/);
@@ -129,7 +133,7 @@ test("processReminders queries due bookings, sends reminder emails, and updates 
       DB: mockDb,
       RESEND_API_KEY: "test_key",
       COORDINATOR_EMAIL: "pejisystems@gmail.com",
-      BOOKING_FROM_EMAIL: "Chicco Optical <bookings@peji.ca>",
+      BOOKING_FROM_EMAIL: "Demo Optometry <bookings@peji.ca>",
       PUBLIC_API_URL: "https://chicco-booking-api.push-peji.workers.dev",
     };
 
@@ -138,8 +142,9 @@ test("processReminders queries due bookings, sends reminder emails, and updates 
     assert.equal(summary.sent, 1);
     assert.equal(summary.failed, 0);
     assert.equal(sentEmails.length, 1);
+    assert.equal(sentEmails[0].from, "Demo Optometry <bookings@peji.ca>");
     assert.equal(sentEmails[0].to[0], "sarah@example.com");
-    assert.match(sentEmails[0].subject, /Reminder: Tomorrow's Eye Exam/);
+    assert.match(sentEmails[0].subject, /\[DEMO\] Reminder: Tomorrow's Eye Exam/);
     assert.equal(dbUpdates.length, 1);
     assert.equal(dbUpdates[0].args[0], "resend-remind-123");
     assert.equal(dbUpdates[0].args[1], "b-101");

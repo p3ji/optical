@@ -16,7 +16,7 @@ crons = ["0 * * * *"]
 [vars]
 ALLOWED_ORIGINS = "https://p3ji.github.io,https://www.peji.ca,https://peji.ca,https://demobooking.peji.ca,https://www.peji.com,http://localhost:4173"
 COORDINATOR_EMAIL = "pejisystems@gmail.com"
-BOOKING_FROM_EMAIL = "Chicco Optical <bookings@peji.ca>"
+BOOKING_FROM_EMAIL = "Demo Optometry <bookings@peji.ca>"
 PUBLIC_API_URL = "https://chicco-booking-api.push-peji.workers.dev"
 
 [[d1_databases]]
